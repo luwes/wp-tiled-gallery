@@ -1,10 +1,11 @@
 <?php
 abstract class Jetpack_Tiled_Gallery_Item {
 	public $image;
+	public $size;
 
-	public function __construct( $attachment_image, $needs_attachment_link, $grayscale ) {
+	public function __construct( $attachment_image, $size, $needs_attachment_link ) {
 		$this->image = $attachment_image;
-		$this->grayscale = $grayscale;
+		$this->size = $size;
 
 		$this->image_title = $this->image->post_title;
 
@@ -21,7 +22,7 @@ abstract class Jetpack_Tiled_Gallery_Item {
 		$this->orig_file = wp_get_attachment_url( $this->image->ID );
 		$this->link = $needs_attachment_link ? get_attachment_link( $this->image->ID ) : $this->orig_file;
 
-		$this->img_src = jetpack_photon_url( $this->orig_file, array( 'resize' => sprintf( '%d,%d', $this->image->width, $this->image->height ) ) );
+		$this->img_src = wp_get_attachment_image_url( $this->image->ID, $size );
 	}
 
 	public function fuzzy_image_meta() {
@@ -61,21 +62,14 @@ abstract class Jetpack_Tiled_Gallery_Item {
 }
 
 class Jetpack_Tiled_Gallery_Rectangular_Item extends Jetpack_Tiled_Gallery_Item {
-	public function __construct( $attachment_image, $needs_attachment_link, $grayscale ) {
-		parent::__construct( $attachment_image, $needs_attachment_link, $grayscale );
-		$this->img_src_grayscale = jetpack_photon_url( $this->img_src, array( 'filter' => 'grayscale' ) );
-
-		$this->size = 'large';
-
-		if ( $this->image->width < 250 )
-			$this->size = 'small';
+	public function __construct( $attachment_image, $size, $needs_attachment_link ) {
+		parent::__construct( $attachment_image, $size, $needs_attachment_link );
 	}
 }
 
 class Jetpack_Tiled_Gallery_Square_Item extends Jetpack_Tiled_Gallery_Item {
-	public function __construct( $attachment_image, $needs_attachment_link, $grayscale ) {
-		parent::__construct( $attachment_image, $needs_attachment_link, $grayscale );
-		$this->img_src_grayscale = jetpack_photon_url( $this->img_src, array( 'filter' => 'grayscale', 'resize' => array( $this->image->width, $this->image->height ) ) );
+	public function __construct( $attachment_image, $size, $needs_attachment_link ) {
+		parent::__construct( $attachment_image, $size, $needs_attachment_link );
 	}
 }
 

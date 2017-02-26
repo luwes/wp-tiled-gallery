@@ -48,7 +48,7 @@ class Jetpack_Tiled_Gallery_Grouper {
 
 	public function __construct( $attachments, $shapes = array() ) {
 		$content_width = Jetpack_Tiled_Gallery::get_content_width();
-		$ua_info = new Jetpack_User_Agent_Info();
+		//$ua_info = new Jetpack_User_Agent_Info();
 
 		$this->overwrite_shapes( $shapes );
 		$this->last_shape = '';
@@ -209,10 +209,10 @@ class Jetpack_Tiled_Gallery_Group {
 		return 1/$ratio;
 	}
 
-	public function items( $needs_attachment_link, $grayscale ) {
+	public function items( $size, $needs_attachment_link ) {
 		$items = array();
 		foreach ( $this->images as $image ) {
-			$items[] = new Jetpack_Tiled_Gallery_Rectangular_Item( $image, $needs_attachment_link, $grayscale );
+			$items[] = new Jetpack_Tiled_Gallery_Rectangular_Item( $image, $size, $needs_attachment_link );
 		}
 
 		return $items;

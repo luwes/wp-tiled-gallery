@@ -1,4 +1,17 @@
 <?php
+/**
+ * Plugin Name: Jetpack Tiled Gallery
+ * Description: Standalone tiled gallery plugin
+ * Version: 0.0.1
+ * Text Domain: jetpack-tiled-gallery
+ *
+ * Code by wordpress.com
+ * Adapted by Wesley Luyten @luwes (https://wesleyluyten.com)
+ *
+ * License: GPL2
+ */
+
+require_once dirname( __FILE__ ) . '/class.jetpack.php';
 
 // Include the class file containing methods for rounding constrained array elements.
 // Here the constrained array element is the dimension of a row, group or an image in the tiled gallery.
@@ -18,11 +31,6 @@ class Jetpack_Tiled_Gallery {
 		add_filter( 'jetpack_default_gallery_type', array( $this, 'jetpack_default_gallery_type' ) );
 	}
 
-	public function tiles_enabled() {
-		// Check the setting status
-		return '' != Jetpack_Options::get_option_and_ensure_autoload( 'tiled_galleries', '' );
-	}
-
 	public function set_atts( $atts ) {
 		global $post;
 
@@ -33,16 +41,16 @@ class Jetpack_Tiled_Gallery {
 			'include'    => '',
 			'exclude'    => '',
 			'type'       => '',
-			'grayscale'  => false,
 			'link'       => '',
-			'columns'	 => 3
+			'columns'		 => 3,
+			'size'			 => 'thumbnail',
 		), $atts, 'gallery' );
 
 		$this->atts['id'] = (int) $this->atts['id'];
 		$this->float = is_rtl() ? 'right' : 'left';
 
 		// Default to rectangular is tiled galleries are checked
-		if ( $this->tiles_enabled() && ( ! $this->atts['type'] || 'default' == $this->atts['type'] ) ) {
+		if ( ! $this->atts['type'] || 'default' == $this->atts['type'] ) {
 			/** This filter is already documented in functions.gallery.php */
 			$this->atts['type'] = apply_filters( 'jetpack_default_gallery_type', 'rectangular' );
 		}
@@ -89,12 +97,12 @@ class Jetpack_Tiled_Gallery {
 	}
 
 	public static function default_scripts_and_styles() {
-		wp_enqueue_script( 'tiled-gallery', plugins_url( 'tiled-gallery/tiled-gallery.js', __FILE__ ), array( 'jquery' ) );
 		if( is_rtl() ) {
 			wp_enqueue_style( 'tiled-gallery', plugins_url( 'tiled-gallery/rtl/tiled-gallery-rtl.css', __FILE__ ), array(), '2012-09-21' );
 		} else {
 			wp_enqueue_style( 'tiled-gallery', plugins_url( 'tiled-gallery/tiled-gallery.css', __FILE__ ), array(), '2012-09-21' );
 		}
+		wp_enqueue_script( 'tiled-gallery', plugins_url( 'tiled-gallery/tiled-gallery.js', __FILE__ ), array( 'jquery' ) );
 	}
 
 	public function gallery_shortcode( $val, $atts ) {
@@ -133,15 +141,8 @@ class Jetpack_Tiled_Gallery {
 
 			// Generate gallery HTML
 			$gallery_class = 'Jetpack_Tiled_Gallery_Layout_' . ucfirst( $this->atts['type'] );
-			$gallery = new $gallery_class( $attachments, $this->atts['link'], $this->atts['grayscale'], (int) $this->atts['columns'] );
+			$gallery = new $gallery_class( $attachments, $this->atts['size'], $this->atts['link'], (int) $this->atts['columns'] );
 			$gallery_html = $gallery->HTML();
-
-			if ( $gallery_html && class_exists( 'Jetpack' ) && class_exists( 'Jetpack_Photon' ) ) {
-				// Tiled Galleries in Jetpack require that Photon be active.
-				// If it's not active, run it just on the gallery output.
-				if ( ! in_array( 'photon', Jetpack::get_active_modules() ) && ! Jetpack::is_development_mode() )
-					$gallery_html = Jetpack_Photon::filter_the_content( $gallery_html );
-			}
 
 			return trim( preg_replace( '/\s+/', ' ', $gallery_html ) ); // remove any new lines from the output so that the reader parses it better
 		}

@@ -14,7 +14,7 @@ foreach ( $rows as $row ): ?>
 			data-original-width="<?php echo esc_attr( $group->width ); ?>"
 			data-original-height="<?php echo esc_attr( $group->height ); ?>"
 		>
-			<?php foreach( $group->items( $needs_attachment_link, $grayscale ) as $item ): ?>
+			<?php foreach( $group->items( $size, $needs_attachment_link ) as $item ): ?>
 				<?php $this->partial( 'item', array( 'item' => $item, 'link' => $link ) ); ?>
 			<?php endforeach; ?>
 		</div> <!-- close group -->
