@@ -12,6 +12,8 @@
  */
 
 require_once dirname( __FILE__ ) . '/class.jetpack.php';
+require_once dirname( __FILE__ ) . '/functions.gallery.php';
+
 
 // Include the class file containing methods for rounding constrained array elements.
 // Here the constrained array element is the dimension of a row, group or an image in the tiled gallery.
